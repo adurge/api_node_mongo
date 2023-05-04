@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const rateLimit = require('express-rate-limit');
 const { body, validationResult } = require('express-validator');
 const logger = require("./src/middleware/logger");
 require('./src/db/connection');
@@ -7,6 +8,12 @@ const Department = require('./src/models/department');
 const Employee = require('./src/models/employee');
 const port = 3000;
 
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
+});
+
+app.use(limiter);
 app.use(express.urlencoded({ extended: true}));
 
 // Save or update employee
