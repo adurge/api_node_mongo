@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const rateLimit = require('express-rate-limit');
+const bodyParser = require("body-parser");
 const { body, validationResult } = require('express-validator');
 const logger = require("./src/middleware/logger");
 require('./src/db/connection');
@@ -14,7 +15,7 @@ const limiter = rateLimit({
 });
 
 app.use(limiter);
-app.use(express.urlencoded({ extended: true}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Save or update employee
 app.post('/', [
@@ -22,7 +23,7 @@ app.post('/', [
   body('first_name').notEmpty(),
   body('last_name').notEmpty(),
   body('email_address').isEmail(),
-  body('department_id').custom(async (value) => {
+  body('department_id').isInt().custom(async (value) => {
     if (mongoose.Types.ObjectId.isValid(value)) {
       const department = await Department.findById(value);
       if (department) {
